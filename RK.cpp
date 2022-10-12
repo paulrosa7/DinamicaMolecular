@@ -107,8 +107,6 @@ void construye_histograma (int nbloques, int npuntos, double *puntos, double *hi
         hist[i]/=(npuntos*delta);
         x[i]=minimo+i*delta;
     }
-
-
 }
 
 void exporta_histograma (int nbloques, double *x, double *hist, char *nombre)
@@ -125,30 +123,36 @@ void exporta_histograma (int nbloques, double *x, double *hist, char *nombre)
 
 double potencial (int flag, double x)
 {
-    if (flag == 1) //oscilador armónico
-        return 0.5*k*x*x;
+    double aux;
+    if (flag == 1) //oscilador armÃ³nico
+        aux = 0.5*k*x*x;
     if (flag == 2)
-        return B*(x*x-1)*(x*x-1);
+        aux = B*(x*x-1)*(x*x-1);
+
+    return aux;
 }
 
 double fuerza (int flag, double x)
 {
-    if (flag == 1) //oscilador armónico
-        return -k*x;
+    double aux;
+    if (flag == 1) //oscilador armÃ³nico
+        aux = -k*x;
     else if (flag == 2)
-        return B*2*(x*x-1)*2*x;
+        aux = B*2*(x*x-1)*2*x;
+    return aux;
 }
 
 double f(int flag, double p)
 {
-    if (flag == 1) //oscilador armónico
-        return p/m;
+    return p/m;
 }
 
 double g(int flag, double x, double p)
 {
+    double aux;
     if (flag == 1)
-        return -k*x-eta*p/m;
+        aux = fuerza(flag, x) -eta*p/m;
+    return aux;
 }
 
 void RK (int flag, double *x, double *p)
@@ -248,10 +252,10 @@ int main ()
     printf ("Para las p: Media:%lf\tVarianza:%lf\tVarianzaMedia:%lf\n", med, var, varmed);
     printf ("<Ecin>=%lf\n", 0.5/m*(var+med*med));
 
-    /**sprintf (nombre, "hist_x_eta=%lf_h=%lf.txt", eta, h);
+    sprintf (nombre, "hist_x_eta=%lf_h=%lf.txt", eta, h);
     exporta_histograma (nbloques, x_ejex, histx, nombre);
     sprintf (nombre, "hist_p_eta=%lf_h=%lf.txt", eta, h);
-    exporta_histograma (nbloques, p_ejex, histp, nombre);**/
+    exporta_histograma (nbloques, p_ejex, histp, nombre);
 
     /**Con damping**/
     eta = 0.1;
@@ -287,10 +291,10 @@ int main ()
             printf ("Para las p: Media:%lf\tVarianza:%lf\tVarianzaMedia:%lf\n", med, var, varmed);
             printf ("<Ecin>=%lf\n", 0.5/m*(var+med*med));
 
-            /**sprintf (nombre, "hist_x_eta=%lf_h=%lf.txt", eta, h);
+            sprintf (nombre, "hist_x_eta=%lf_h=%lf.txt", eta, h);
             exporta_histograma (nbloques, x_ejex, histx, nombre);
             sprintf (nombre, "hist_p_eta=%lf_h=%lf.txt", eta, h);
-            exporta_histograma (nbloques, p_ejex, histp, nombre);**/
+            exporta_histograma (nbloques, p_ejex, histp, nombre);
 
             h=10*h;
             printf ("\n\n");
@@ -353,3 +357,4 @@ int main ()
 
     return 0;
 }
+
