@@ -21,8 +21,11 @@ double m = 1;
 double h = 0.1;
 double const_estocastica = 2;
 
-double parisi_rapuano ()
-{
+double f(double x){
+    return -k*x;
+}
+
+double parisi_rapuano (){
     unsigned int irr [256];
     unsigned char ind_ran=0, ig1=0, ig2=0, ig3=0;
     double numero_aleatorio;
@@ -42,8 +45,7 @@ double parisi_rapuano ()
     return numero_aleatorio*NormRANu;
 }
 
-void med_var (double *input, int numero, double *media, double *varianza, double *varianza_media)
-{
+void med_var (double *input, int numero, double *media, double *varianza, double *varianza_media){
     int i;
     double suma_med = 0, suma_var = 0;
     for (i = 0; i<numero; i++)
@@ -62,18 +64,16 @@ void med_var (double *input, int numero, double *media, double *varianza, double
     *varianza_media = *varianza/numero;
 }
 
-void box_muller (double *g1, double *g2, double varianza)
-{
+void box_muller (double *g1, double *g2, double varianza){
     double w1, w2;
     w1 = parisi_rapuano ();
     w2 = parisi_rapuano ();
 
-    *g1 = -sqrt(-2*log(w1))*cos(2*pi*w2)*sqrt(varianza);
-    *g2 = -sqrt(-2*log(w1))*sin(2*pi*w2)*sqrt(varianza);
+    *g1 = -sqrt(-2*log(w1))*cos(2*pi*w2);
+    *g2 = -sqrt(-2*log(w1))*sin(2*pi*w2);
 }
 
-void min_max (int npuntos, double *puntos, double *minimo, double *maximo)
-{
+void min_max (int npuntos, double *puntos, double *minimo, double *maximo){
     int i;
 
     *minimo = *maximo = puntos [0];
@@ -84,8 +84,7 @@ void min_max (int npuntos, double *puntos, double *minimo, double *maximo)
     }
 }
 
-void construye_histograma (int nbloques, int npuntos, double *puntos, double *hist, double *x)
-{
+void construye_histograma (int nbloques, int npuntos, double *puntos, double *hist, double *x){
     double minimo, maximo, delta;
     int i, aux;
 
@@ -102,15 +101,13 @@ void construye_histograma (int nbloques, int npuntos, double *puntos, double *hi
 
     for (i=0; i<nbloques; i++)
     {
-        hist[i]/=npuntos;
+        hist[i]/=npuntos; /*se supone que ya esta normalizado?*/
         x[i]=minimo+i*delta;
     }
 
-
 }
 
-void exporta_histograma (int nbloques, double *x, double *hist, char *nombre)
-{
+void exporta_histograma (int nbloques, double *x, double *hist, char *nombre){
     int i;
     FILE *f = fopen (nombre, "w");
 
@@ -129,8 +126,7 @@ void mostrarGraficas(char *n1, char *n2){
     system("gnu.plt");
 }
 
-void RK (double *x, double *p)
-{
+void RK (double *x, double *p){
     double fx1, fx2, gp1, gp2;
     double xn, pn, cte;
     double random1, random2;
@@ -142,20 +138,16 @@ void RK (double *x, double *p)
     //printf ("cte=%lf\n", cte);
 
     fx1 = (pn+cte)/m;
-    gp1 = (-eta/m*(pn+cte))-k*xn;
+    gp1 = (-eta/m*(pn+cte))+f(xn);
     //printf ("fx1=%lf\tgp1=%lf\n", fx1, gp1);
     fx2 = (pn+h*gp1)/m;
-    gp2 = -eta/m*(pn+h*gp1)-k*(xn+h*fx1);
+    gp2 = -eta/m*(pn+h*gp1)+f(xn+h*fx1);
     //printf ("fx2=%lf\tgp2=%lf\n", fx2, gp2);
 
     *x+=h/2.*(fx1+fx2);
     *p+=h/2.*(gp1+gp2)+cte;
 
     printf ("x=%lf\tp=%lf\n\n", *x, *p);
-}
-
-double f(double x){
-    return -k*x;
 }
 
 void verlet (double *x, double *p, double a, double b){
@@ -179,13 +171,12 @@ void eulerMaruyama(double *x,double *p,int i){
     box_muller(&random1, &random2, const_estocastica);
 
     *x=*x+h*(*p)/m;
-    *p=*p+(-eta*(*p)/m-k*(*x))*h+sqrt(2*eta*kBT*h)*random1;
+    *p=*p+(-eta*(*p)/m+f(*x))*h+sqrt(2*eta*kBT*h)*random1;
     if(i%1000==0){printf ("x=%lf\tp=%lf\n\n", *x, *p);}
 
 }
 
-int main ()
-{
+int main (){
     int i, npuntos = PUNTOSMAX, nbloques=BLOQUESMAX, nmedidas=MEDIDASMAX;
     double g1, g2, med, var, varmed;
     double puntos [PUNTOSMAX];
@@ -250,4 +241,5 @@ int main ()
     mostrarGraficas(nombre1,nombre2);
 
 }
+
 
